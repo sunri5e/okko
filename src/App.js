@@ -1,25 +1,23 @@
-import { useRef, useState } from 'react'
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
 
 const cities = [
-  {name: "Вся Україна", value: ""},
-  {name: "Київ", value: "Київ"},
-  {name: "Львів", value: "Львів"},
-  {name: "Луцьк", value: "Луцьк"},
-  {name: "Івано-Франківськ", value: "Івано-Франківськ"},
-  {name: "Рівне", value: "Рівне"},
-  {name: "Тернопіль", value: "Тернопіль"},
+  { name: "Вся Україна", value: "" },
+  { name: "Київ", value: "Київ" },
+  { name: "Львів", value: "Львів" },
+  { name: "Луцьк", value: "Луцьк" },
+  { name: "Івано-Франківськ", value: "Івано-Франківськ" },
+  { name: "Рівне", value: "Рівне" },
+  { name: "Тернопіль", value: "Тернопіль" },
 ];
 
 const gasTypeList = [
-  {name: "Всі типи", value: ""},
-  {name: "PULLS 95", value: "PULLS 95"},
-  {name: "А-95", value: "А-95"},
-  {name: "ДП", value: "ДП"},
-  {name: "PULLS Diesel", value: "PULLS Diesel"},
+  { name: "Всі типи", value: "" },
+  { name: "PULLS 95", value: "PULLS 95" },
+  { name: "А-95", value: "А-95" },
+  { name: "ДП", value: "ДП" },
+  { name: "PULLS Diesel", value: "PULLS Diesel" },
 ];
-
-
 
 function App() {
   // const [riskInUSD, setRiskInUSD] = useState('');
@@ -81,7 +79,7 @@ function App() {
   //             usdOnLevels.push(Number((usdOnLevels[i-1] * stepCoef).toFixed(2)));
   //           }
   //         }
-          
+
   //         totalInOrder = Number((usdOnLevels.reduce((partial_sum, a) => partial_sum + a,0)).toFixed(7));
   //         quantity = Number((levels.map((e, i) => usdOnLevels[i] / e).reduce((partial_sum, a) => partial_sum + a,0)).toFixed(7));
   //         stopLoss = Number(((totalInOrder - riskInUSD) / quantity).toFixed(4));
@@ -110,90 +108,198 @@ function App() {
   //   console.log(totals.usdOnLevels);
   // }
 
-
-  const [result, setResult] = useState('');
-  const [city, setCity] = useState('');
-  const [gasType, setGasType] = useState('');
-
+  const [result, setResult] = useState("");
+  const [city, setCity] = useState("");
+  const [gasType, setGasType] = useState("");
 
   const getResp = async (city, gas) => {
-    const response = await fetch('https://www.okko.ua/api/uk/type/gas_stations?');
+    const response = await fetch(
+      "https://www.okko.ua/api/uk/type/gas_stations?"
+    );
     const data = await response.json();
     const regex = new RegExp(gas);
 
-    const filter = data.collection.filter(e => e.attributes.Naselenyy_punkt === city).filter((e) => e.attributes.notification.match(regex));
+    const filter = data.collection
+      .filter((e) => e.attributes.Naselenyy_punkt === city)
+      .filter((e) => e.attributes.notification.match(regex));
 
     if (city) {
-      setResult(filter)
+      setResult(filter);
     } else {
-      setResult(data.collection)
+      setResult(data.collection);
     }
-  }
+  };
 
   const cutter = (arr) => {
     const reg1 = /З ПАЛИВНОЮ КАРТКОЮ І ТАЛОНАМИ ДОСТУПНО:/i;
     const copy = JSON.parse(JSON.stringify(arr));
-    const cutRes = arr.map(e => e.attributes.notification.slice(0, e.attributes.notification.search(reg1)))
+    const cutRes = arr.map((e) =>
+      e.attributes.notification.slice(0, e.attributes.notification.search(reg1))
+    );
 
-    cutRes.forEach((e,i) => {
+    cutRes.forEach((e, i) => {
       copy[i].attributes.notification = e;
     });
 
     return copy;
-  }
-  
+  };
+
   const getAval = (res) => {
     const reg1 = /ЗА ГОТІВКУ І БАНКІВСЬКІ КАРТКИ ДОСТУПНО:\*:/i;
     const reg2 = new RegExp(gasType);
-    const matchedSites = cutter(res).filter((e) => e.attributes.notification.match(reg1)).filter((e) => e.attributes.notification.match(reg2));
+    const matchedSites = cutter(res)
+      .filter((e) => e.attributes.notification.match(reg1))
+      .filter((e) => e.attributes.notification.match(reg2));
 
     setResult(matchedSites);
-  }
+  };
 
   const handleCityChange = (e) => {
     const c = e.target.value;
     setCity(c);
     getResp(c, gasType);
-  }
+  };
 
   const handleGasTypeChange = (e) => {
     const gas = e.target.value;
     setGasType(gas);
     getResp(city, gas);
-  }
-
+  };
 
   return (
-    <div className="App">
-      <h1>OKKO фільтр</h1>
+    <div className="App container mx-auto px-8 pt-10 pb-20">
+      <h1 className="text-2xl font-bold text-center mb-8">OKKO фільтр</h1>
       {/* <button type='button' onClick={() => getResp('')}>Get All AZS</button> */}
       {/* <button type='button' onClick={() => getAval(result)}>Get AVAL</button> */}
-      <br /><br />
-      <p>
-        <label htmlFor="city">Обери місто</label>
-        <select name="city" id="city" value={city} onChange={handleCityChange}>
-          {cities.map(e => <option value={e.value} >{e.name}</option>)}
-        </select>
-      </p>
-      <p>
-        <label htmlFor="">Обери паливо</label>
-        <select name="gasType" id="gasType" value={gasType} onChange={handleGasTypeChange}>
-          {gasTypeList.map(e => <option value={e.value} >{e.name}</option>)}
-        </select>
-        <br />
-        <small><i>буде показанно всі заправки де є колонки з обраним типом палива</i></small>
-      </p>
-      <p>
-        <button type='button' onClick={() => getAval([...result])}>Показати де обране паливо доступне з Fishka</button>
-      </p>
-      <br /><br /><br /><br />
-      <ul>
-        {result && result.map(e => <><li>
-          <p>{e.attributes.Naselenyy_punkt} - {e.attributes.Adresa}</p>
-          <br />
-          <div dangerouslySetInnerHTML={{ __html: e.attributes.notification }} />
-        </li><hr /></>)}
-      </ul>
+      <div className="w-full max-w-lg mx-auto">
+        <p className="md:flex md:items-center mb-6">
+          <label
+            className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2 md:w-1/4"
+            htmlFor="city"
+          >
+            Обери місто
+          </label>
+          <div className="relative md:w-3/4">
+            <select
+              name="city"
+              id="city"
+              value={city}
+              onChange={handleCityChange}
+              className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+            >
+              {cities.map((e, i) => (
+                <option key={i} value={e.value}>
+                  {e.name}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <svg
+                className="fill-current h-4 w-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+              >
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+              </svg>
+            </div>
+          </div>
+        </p>
+        <div className="mb-6">
+          <p className="md:flex md:items-center">
+            <label
+              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2 md:w-1/4"
+              htmlFor="gasType"
+            >
+              Обери паливо
+            </label>
+            <div className="md:w-3/4">
+              <div className="relative">
+                <select
+                  name="gasType"
+                  id="gasType"
+                  value={gasType}
+                  onChange={handleGasTypeChange}
+                  className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                >
+                  {gasTypeList.map((e, i) => (
+                    <option key={i} value={e.value}>
+                      {e.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg
+                    className="fill-current h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </p>
+          <div className="md:text-right">
+            <small>
+              <i>буде показанно всі АЗС де є колонки з обраним типом палива</i>
+            </small>
+          </div>
+        </div>
+        <p className="text-right">
+          <button
+            className="px-4 py-2 font-semibold text-sm bg-cyan-500 text-white rounded-full shadow-sm"
+            type="button"
+            onClick={() => getAval([...result])}
+          >
+            Показати де обране паливо доступне з Fishka
+          </button>
+        </p>
+      </div>
+      {result && result.length ? (
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-16">
+          {result.map((e, i) => (
+            <li
+              key={i}
+              className="bg-white border-2 border-green-500/100 p-4 rounded-lg shadow-xl text-center"
+            >
+              <p>
+                {e.attributes.Naselenyy_punkt} - {e.attributes.Adresa}
+              </p>
+              <br />
+              <div
+                dangerouslySetInnerHTML={{ __html: e.attributes.notification }}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="w-full max-w-lg mx-auto mt-16">
+          {!city && !gasType ? (
+            <div className="text-center">
+              <p className="mb-6 text-gray-500">
+                {`Для показу результатів введіть спершу свій запит`}
+              </p>
+              <img
+                src="https://i.gifer.com/1xZ.gif"
+                alt="John Travolta confused"
+                className="object-cover w-full rounded-lg"
+              />
+            </div>
+          ) : (
+            <div className="text-center">
+              <p className="mb-6 text-gray-500">
+                {`На даний момент паливо марки ${gasType} відсутнє у вільному доступі у місті ${city} `}
+              </p>
+              <img
+                src="https://i.gifer.com/5LSi.gif"
+                alt="John Travolta confused"
+                className="object-cover w-full rounded-lg"
+              />
+            </div>
+          )}
+        </div>
+      )}
+
       {/* <header className="App-header">
         <form onSubmit={calculate}>
           <table>
@@ -246,9 +352,6 @@ function App() {
           </tbody>
         </table>
       </header> */}
-
-
-
     </div>
   );
 }
