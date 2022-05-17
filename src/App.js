@@ -6,6 +6,9 @@ const cities = [
   {name: "Київ", value: "Київ"},
   {name: "Львів", value: "Львів"},
   {name: "Луцьк", value: "Луцьк"},
+  {name: "Івано-Франківськ", value: "Івано-Франківськ"},
+  {name: "Рівне", value: "Рівне"},
+  {name: "Тернопіль", value: "Тернопіль"},
 ];
 
 const gasTypeList = [
@@ -122,10 +125,8 @@ function App() {
 
     if (city) {
       setResult(filter)
-      console.log(filter);
     } else {
       setResult(data.collection)
-      console.log(data.collection);
     }
   }
 
@@ -142,12 +143,9 @@ function App() {
   }
   
   const getAval = (res) => {
-    console.log('cutter: ', cutter(res));
-
     const reg1 = /ЗА ГОТІВКУ І БАНКІВСЬКІ КАРТКИ ДОСТУПНО:\*:/i;
     const reg2 = new RegExp(gasType);
     const matchedSites = cutter(res).filter((e) => e.attributes.notification.match(reg1)).filter((e) => e.attributes.notification.match(reg2));
-    console.log(matchedSites);
 
     setResult(matchedSites);
   }
@@ -167,16 +165,27 @@ function App() {
 
   return (
     <div className="App">
-      <button type='button' onClick={() => getResp('')}>Get All AZS</button>
+      <h1>OKKO фільтр</h1>
+      {/* <button type='button' onClick={() => getResp('')}>Get All AZS</button> */}
       {/* <button type='button' onClick={() => getAval(result)}>Get AVAL</button> */}
-      <br /><br /><br /><br />
-      <select name="city" id="city" value={city} onChange={handleCityChange}>
-        {cities.map(e => <option value={e.value} >{e.name}</option>)}
-      </select>
-      <select name="gasType" id="gasType" value={gasType} onChange={handleGasTypeChange}>
-        {gasTypeList.map(e => <option value={e.value} >{e.name}</option>)}
-      </select>
-      <button type='button' onClick={() => getAval([...result])}>Доступно за карту</button>
+      <br /><br />
+      <p>
+        <label htmlFor="city">Обери місто</label>
+        <select name="city" id="city" value={city} onChange={handleCityChange}>
+          {cities.map(e => <option value={e.value} >{e.name}</option>)}
+        </select>
+      </p>
+      <p>
+        <label htmlFor="">Обери паливо</label>
+        <select name="gasType" id="gasType" value={gasType} onChange={handleGasTypeChange}>
+          {gasTypeList.map(e => <option value={e.value} >{e.name}</option>)}
+        </select>
+        <br />
+        <small><i>буде показанно всі заправки де є колонки з обраним типом палива</i></small>
+      </p>
+      <p>
+        <button type='button' onClick={() => getAval([...result])}>Показати де обране паливо доступне з Fishka</button>
+      </p>
       <br /><br /><br /><br />
       <ul>
         {result && result.map(e => <><li>
