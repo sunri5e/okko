@@ -1,22 +1,22 @@
 {
   "files": {
     "main.css": "/okko/static/css/main.0385f92f.chunk.css",
-    "main.js": "/okko/static/js/main.54af3c8e.chunk.js",
-    "main.js.map": "/okko/static/js/main.54af3c8e.chunk.js.map",
+    "main.js": "/okko/static/js/main.4c02981d.chunk.js",
+    "main.js.map": "/okko/static/js/main.4c02981d.chunk.js.map",
     "runtime-main.js": "/okko/static/js/runtime-main.0ec43ef9.js",
     "runtime-main.js.map": "/okko/static/js/runtime-main.0ec43ef9.js.map",
-    "static/js/2.b4b648ac.chunk.js": "/okko/static/js/2.b4b648ac.chunk.js",
-    "static/js/2.b4b648ac.chunk.js.map": "/okko/static/js/2.b4b648ac.chunk.js.map",
+    "static/js/2.08f9c438.chunk.js": "/okko/static/js/2.08f9c438.chunk.js",
+    "static/js/2.08f9c438.chunk.js.map": "/okko/static/js/2.08f9c438.chunk.js.map",
     "static/js/3.25068da9.chunk.js": "/okko/static/js/3.25068da9.chunk.js",
     "static/js/3.25068da9.chunk.js.map": "/okko/static/js/3.25068da9.chunk.js.map",
     "index.html": "/okko/index.html",
     "static/css/main.0385f92f.chunk.css.map": "/okko/static/css/main.0385f92f.chunk.css.map",
-    "static/js/2.b4b648ac.chunk.js.LICENSE.txt": "/okko/static/js/2.b4b648ac.chunk.js.LICENSE.txt"
+    "static/js/2.08f9c438.chunk.js.LICENSE.txt": "/okko/static/js/2.08f9c438.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.0ec43ef9.js",
-    "static/js/2.b4b648ac.chunk.js",
+    "static/js/2.08f9c438.chunk.js",
     "static/css/main.0385f92f.chunk.css",
-    "static/js/main.54af3c8e.chunk.js"
+    "static/js/main.4c02981d.chunk.js"
   ]
 }
