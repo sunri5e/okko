@@ -7,6 +7,9 @@
 // @author      sunri5e
 // ==/UserScript==
 
+window.innerWidth = 420;
+window.innerHeight = 640;
+
 function setUserAgent(window, userAgent) {
     // Works on Firefox, Chrome, Opera and IE9+
     if (navigator.__defineGetter__) {
