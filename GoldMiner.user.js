@@ -75,13 +75,23 @@ setUserAgent(window, ug);
         var rect = canvas.getBoundingClientRect();
         var x = rect.left + rect.width / 2;
         var y = rect.top + rect.height * 0.65;
+        var tapCount = 0;
+        var maxTaps = 40;
 
         // Function to tap at intervals
         function tapAtInterval() {
+            // Check if the tap count has reached the maximum number of executions
+            if (tapCount >= maxTaps) {
+                console.log('Stopped tapping after ' + maxTaps + ' executions.');
+                return;
+            }
+            
             console.log('Tapping at (' + x + ', ' + y + ')');
             triggerTap(canvas, x, y);
 
-            var interval = 92000 + getRandomInt(0, 10000);
+            tapCount++;
+
+            var interval = 100 + getRandomInt(0, 200);
             setTimeout(tapAtInterval, interval);
         }
 
