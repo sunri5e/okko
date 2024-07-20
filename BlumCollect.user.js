@@ -43,10 +43,17 @@ async function waitForAndClickButtons() {
     const firstButton = await waitForElement('.kit-fixed-wrapper.has-layout-tabs .kit-button.is-large.is-drop.is-fill.button.is-done');
     firstButton.click();
 
-    const secondButton = await waitForElement('.kit-fixed-wrapper.has-layout-tabs .kit-button.is-large.is-primary.is-fill.button');
-    secondButton.click();
+    // Wait for 2 seconds before looking for the second button
+    setTimeout(async () => {
+      try {
+        const secondButton = await waitForElement('.kit-fixed-wrapper.has-layout-tabs .kit-button.is-large.is-primary.is-fill.button');
+        secondButton.click();
+      } catch (error) {
+        console.error('Second button error: ' + error.message);
+      }
+    }, 2000);
   } catch (error) {
-    console.error(error.message);
+    console.error('First button error: ' + error.message);
   }
 }
 
