@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Yaytsogram
 // @namespace   Violentmonkey Scripts
-// @match       *://*.yaytsogram.app/*
+// @match       *://*yaytsogram.app/*
 // @grant       none
 // @version     1.0
 // @author      sunri5e
