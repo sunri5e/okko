@@ -7,7 +7,6 @@
 // @author      sunri5e
 // ==/UserScript==
 
-
 // Function to wait for a specified element to appear in the DOM
 function waitForElement(selector, timeout = 10000) {
   return new Promise((resolve, reject) => {
@@ -37,9 +36,23 @@ function waitForElement(selector, timeout = 10000) {
   });
 }
 
+// Function to click the button inside .daily-reward-page if it appears
+async function checkDailyRewardPage() {
+  try {
+    const rewardButton = await waitForElement('.daily-reward-page .kit-button.is-large.is-primary.is-fill.btn', 3000);
+    rewardButton.click();
+  } catch (error) {
+    // If the .daily-reward-page doesn't appear within the timeout, continue without error
+    console.log('.daily-reward-page not found within timeout, proceeding...');
+  }
+}
+
 // Function to wait for the first button to appear and click it, then wait for the second button to appear and click it
 async function waitForAndClickButtons() {
   try {
+    // Check for .daily-reward-page first
+    await checkDailyRewardPage();
+
     const firstButton = await waitForElement('.kit-fixed-wrapper.has-layout-tabs .kit-button.is-large.is-drop.is-fill.button.is-done');
     firstButton.click();
 
