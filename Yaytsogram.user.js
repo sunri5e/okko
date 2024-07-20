@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        GoldMiner clicker
+// @name        Yaytsogram
 // @namespace   Violentmonkey Scripts
 // @match       *://*.yaytsogram.app/*
 // @grant       none
