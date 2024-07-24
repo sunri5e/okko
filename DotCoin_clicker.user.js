@@ -1,3 +1,12 @@
+// ==UserScript==
+// @name        DotCoin clicker
+// @namespace   Violentmonkey Scripts
+// @match       https://dot.dapplab.xyz/*
+// @grant       none
+// @version     1.0
+// @author      sunri5e
+// ==/UserScript==
+
 function getRandomMs(base, max) {
     return base + Math.floor(Math.random() * max);
 }
