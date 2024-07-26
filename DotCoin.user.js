@@ -11,7 +11,7 @@ function getRandomMs(base, max) {
     return base + Math.floor(Math.random() * max);
 }
 
-function simulateTouchStart(element) {
+function tap(element) {
     if (!element) {
         console.error('Element is required');
         return;
