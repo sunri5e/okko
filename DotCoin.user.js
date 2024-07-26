@@ -1,14 +1,45 @@
+// ==UserScript==
+// @name        DotCoin clicker
+// @namespace   Violentmonkey Scripts
+// @match       https://dot.dapplab.xyz/*
+// @grant       none
+// @version     1.0
+// @author      sunri5e
+// ==/UserScript==
+
 function getRandomMs(base, max) {
     return base + Math.floor(Math.random() * max);
 }
 
-function tap(element) {
-    var event = new MouseEvent('pointerup', {
-        bubbles: true,
-        clientX: x,
-        clientY: y
+function simulateTouchStart(element) {
+    if (!element) {
+        console.error('Element is required');
+        return;
+    }
+
+    var touchObj = new Touch({
+        identifier: Date.now(),
+        target: element,
+        clientX: element.getBoundingClientRect().left,
+        clientY: element.getBoundingClientRect().top,
+        pageX: element.getBoundingClientRect().left,
+        pageY: element.getBoundingClientRect().top,
+        radiusX: 2.5,
+        radiusY: 2.5,
+        rotationAngle: 10,
+        force: 0.5,
     });
-    element.dispatchEvent(event);
+
+    var touchEvent = new TouchEvent('touchstart', {
+        bubbles: true,
+        cancelable: true,
+        touches: [touchObj],
+        targetTouches: [touchObj],
+        changedTouches: [touchObj],
+        shiftKey: true, // you can set other properties as needed
+    });
+
+    element.dispatchEvent(touchEvent);
 }
 
 function startTapping() {
