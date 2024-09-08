@@ -4,8 +4,8 @@
 // @match        *://*.hamsterkombat.io/*
 // @match        *://*.hamsterkombatgame.io/*
 // @exclude      https://hamsterkombatgame.io/games/UnblockPuzzle/*
-// @version      2.5
-// @description  26.08.2024
+// @version      2.8
+// @description  04.09.2024
 // @grant        none
 // @icon         https://hamsterkombatgame.io/images/icons/hamster-coin.png
 // @downloadURL  https://github.com/mudachyo/Hamster-Kombat/raw/main/hamster-autoclicker.user.js
@@ -44,11 +44,11 @@
 		maxEnergyRefillDelay: 180000, // Максимальная задержка в миллисекундах для пополнения энергии (180 секунд)
 		maxRetries: 5, // Максимальное количество попыток перед перезагрузкой страницы
 		autoBuyEnabled: true, // Автопокупка по умолчанию выключена
-		maxPaybackHours: 672, // Максимальное время окупаемости в часах для автопокупки (4 недели)
-		isPaused: false
+		maxPaybackHours: 1344, // Максимальное время окупаемости в часах для автопокупки (4 недели)
+		isPaused: false // Пауза по умолчанию выключена
 	};
-	
-	const pauseDelay = 2000; 
+
+	const pauseDelay = 2000;
 	const dotDelay = 1;
 	const dashDelay = 750;
 	const multiplyTap = 16;
@@ -75,23 +75,23 @@
 	function getRandomNumber(min, max) {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
-	
+
 	async function sendMorseCode(text) {
 		const morseString = textToMorse(text);
 		console.log('Converted Morse Code:', morseString);
 		await textToTap(morseString);
 	}
-	
+
 	function textToMorse(text) {
 		const morseCodeMap = {
 			'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.', 'G': '--.', 'H': '....',
 			'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---', 'P': '.--.',
 			'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
 			'Y': '-.--', 'Z': '--..', ' ': ' ',
-			'0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-', 
+			'0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-',
 			'5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.'
 		};
-	
+
 		return text.toUpperCase().split('').map(char => {
 			if (char in morseCodeMap) {
 				return morseCodeMap[char];
@@ -123,30 +123,30 @@
 
 	async function fetchHamsterData() {
 		const token = localStorage.getItem('authToken');
-		
+
 		if (!token) {
 			console.error("Токен не найден в Local Storage");
 			return null;
 		}
-	
+
 		const url = `${baseUrl}/clicker/config`;
 		const headers = {
 			'Authorization': `Bearer ${token}`,
 			'Content-Type': 'application/json'
 		};
-	
+
 		try {
 			const response = await fetch(url, {
 				method: 'POST',
 				headers: headers
 			});
-	
+
 			if (!response.ok) {
 				throw new Error(`HTTP error! status: ${response.status}`);
 			}
-	
+
 			const data = await response.json();
-	
+
 			if (data.dailyCipher) {
 				const encodedCipher = data.dailyCipher.cipher;
 				const correctedCipher = encodedCipher.slice(0, 3) + encodedCipher.slice(4);
@@ -157,7 +157,7 @@
 		} catch (error) {
 			console.error("Ошибка при получении данных:", error);
 		}
-		
+
 		return null;
 	}
 
@@ -198,7 +198,7 @@
 
 		await pauseBetweenLetters();
 	}
-	
+
 	function energyLevel() {
         const energyElement = document.querySelector(".user-tap-energy p");
         if (energyElement) {
@@ -206,7 +206,7 @@
         }
         return 0;
     }
-	
+
 	async function simulateTap(button, delay) {
         const rect = button.getBoundingClientRect();
         const centerX = rect.left + (rect.width / 2);
@@ -266,7 +266,10 @@
 	RU: Сначала примите задания YouTube. Затем нажмите эту кнопку, чтобы сбросить таймер. Вам не нужно будет ждать час, пока задания проверятся, и вы сможете сразу забрать награду.
 	  `;
 
-	  alert(instruction);
+	  if (!localStorage.getItem('instructionShown')) {
+		alert(instruction);
+		localStorage.setItem('instructionShown', 'true');
+	  }
 
 	  for (let i = 0; i < localStorage.length; i++) {
 		let key = localStorage.key(i);
@@ -285,6 +288,40 @@
 	  alert("EN: The YouTube quest timer has been successfully reset! If you have already accepted the quests, you can collect the reward for them.\n\nRU: Таймер YouTube-заданий успешно сброшен! Если вы уже приняли задания, вы можете забрать за них награду.");
 	}
 
+	let messageRemoved = false;
+
+	function checkForDisabledButton() {
+		if (messageRemoved) return;
+
+		const disabledButton = document.querySelector('.button:disabled.button-primary');
+		const messageElement = document.getElementById('minigame-message');
+
+		if (window.location.href.includes('playground') && disabledButton) {
+			if (!messageElement) {
+				const newMessageElement = document.createElement('div');
+				newMessageElement.id = 'minigame-message';
+				newMessageElement.style.position = 'fixed';
+				newMessageElement.style.top = '10px';
+				newMessageElement.style.left = '50%';
+				newMessageElement.style.transform = 'translateX(-50%)';
+				newMessageElement.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+				newMessageElement.style.color = 'white';
+				newMessageElement.style.padding = '10px';
+				newMessageElement.style.borderRadius = '5px';
+				newMessageElement.style.zIndex = '1000';
+				newMessageElement.innerHTML = 'Если у вас не загружается миниигра, то вам нужно открыть игру в новом окне (синяя кнопка справа сверху)<br>If the minigame does not load, you need to open the game in a new window (blue button at the top right)';
+				document.body.appendChild(newMessageElement);
+			}
+		} else {
+			if (messageElement) {
+				messageElement.remove();
+				messageRemoved = true;
+			}
+		}
+	}
+
+	setInterval(checkForDisabledButton, 1000);
+
 	function checkForEarnMoreCoins() {
 	  const earnMoreCoinsElement = document.querySelector('div.earn-top-title[style*="opacity: 1"]');
 	  const resetButton = document.querySelector('.reset-timer-button');
@@ -295,7 +332,7 @@
 		resetButton.style.display = 'none';
 	  }
 	}
-	
+
     function actionCanProceed(energyNow, clickWord, clickTime, multiplyTap) {
         let energyCost = Math.ceil((clickWord * multiplyTap) - ((clickTime / 1000) * 3));
         let waitUntilEnergy = 0;
@@ -306,6 +343,37 @@
 
         return waitUntilEnergy;
     }
+
+	function adjustMinigameSizes() {
+		if (window.self !== window.top) return;
+
+		const puzzle = document.querySelector('.minigame-puzzle');
+		if (!puzzle) return;
+
+		const minigame = document.querySelector('.minigame');
+		const minigameBg = document.querySelector('.minigame-bg');
+
+		if (minigame) {
+			minigame.style.position = 'fixed';
+			minigame.style.width = '418px'; // 597px уменьшено на 30%
+			minigame.style.height = '661px'; // 945px уменьшено на 30%
+		}
+
+		if (minigameBg) {
+			minigameBg.style.position = 'fixed';
+			minigameBg.style.width = '418px'; // 597px уменьшено на 30%
+			minigameBg.style.height = '661px'; // 945px уменьшено на 30%
+		}
+
+		// Модификация игры с ключами
+		const defaultStringify = JSON.stringify;
+		JSON.stringify = function (gameData) {
+			if (gameData?.level) {
+				gameData.level = '- - - - - -.- - - - - -.- - 0 0 - -.- - - - - -.- - - - - -.- - - - - -';
+			}
+			return defaultStringify(gameData);
+		};
+	}
 
 	function performRandomClick() {
 		if (settings.isPaused) {
@@ -321,15 +389,18 @@
 		}
 
 		const energyElement = document.getElementsByClassName("user-tap-energy")[0];
-		const buttonElement = document.getElementsByClassName('user-tap-button')[0];
+		const buttonElement = document.querySelector('.user-tap-button');
 
-		if (!energyElement || !buttonElement) {
+		if (!energyElement || !buttonElement || buttonElement.classList.contains('is-morse-mode')) {
 			console.log(`${logPrefix}Element not found, retrying...`, styles.error);
 
 			retryCount++;
 			if (retryCount >= settings.maxRetries) {
-				console.log(`${logPrefix}Max retries reached, but Earn more coins element is not present. Reloading page...`, styles.error);
-				location.reload();
+			console.log(`${logPrefix}Max retries reached, continuing attempts...`, styles.info);
+			retryCount = 0;
+			setTimeout(() => {
+				setTimeout(performRandomClick, getRandomNumber(settings.minInterval, settings.maxInterval));
+			}, 2000);
 			} else {
 				setTimeout(() => {
 					setTimeout(performRandomClick, getRandomNumber(settings.minInterval, settings.maxInterval));
@@ -382,16 +453,24 @@
 		}
 	}
 
+	function clickClaimDailyButton() {
+		const claimButton = document.querySelector('.daily-reward-bottom-button .button.button-primary.button-large');
+		if (claimButton) {
+			claimButton.click();
+			console.log(`${logPrefix}'Claim' button clicked.`, styles.success);
+		}
+	}
+
 	// thx for *clqkx
 	async function autoBuy() {
 		if (!settings.autoBuyEnabled) {
 			return;
 		}
-	
+
 		try {
 			const { balance } = await updateClickerData();
 			const upgradesForBuy = window.useNuxtApp().$pinia._s.get('upgrade').upgradesForBuy;
-	
+
 			const sortedData = upgradesForBuy
 				.filter(item => {
 					const paybackHours = item.price / item.profitPerHourDelta;
@@ -402,21 +481,21 @@
 					paybackTime: item.price / item.profitPerHourDelta
 				}))
 				.sort((a, b) => a.paybackTime - b.paybackTime);
-	
+
 			if (sortedData.length > 0) {
 				const bestCard = sortedData[0];
-	
+
 				if (balance < bestCard.price) {
 					console.log(`${logPrefix}Waiting for sufficient balance to buy (${bestCard.name})`, styles.info);
 					setTimeout(autoBuy, getRandomNumber(3000, 3500));
 					return;
 				}
-	
+
 				try {
 					const delay = getRandomNumber(5000, 10000);
 					console.log(`${logPrefix}Waiting for ${delay / 1000} seconds before buying (${bestCard.name})`, styles.info);
 					await new Promise(resolve => setTimeout(resolve, delay));
-	
+
 					await window.useNuxtApp().$pinia._s.get('upgrade').postBuyUpgrade(bestCard.id);
 					console.log(`${logPrefix}Success buy (${bestCard.name})`, styles.success);
 				} catch (e) {
@@ -426,7 +505,7 @@
 		} catch (e) {
 			console.log(`${logPrefix}Error in autoBuy function: ${e.message}`, styles.error);
 		}
-	
+
 		if (settings.autoBuyEnabled) {
 			setTimeout(autoBuy, getRandomNumber(3000, 3500));
 		}
@@ -438,20 +517,20 @@
 			if (!upgradeStore || !upgradeStore.upgradesForBuy) {
 				throw new Error('Upgrade data not available');
 			}
-	
+
 			let upgradesForBuy = upgradeStore.upgradesForBuy;
-			
+
 			upgradesForBuy.sort((a, b) => {
 				const paybackTimeA = a.profitPerHourDelta ? (a.price / a.profitPerHourDelta) : Infinity;
 				const paybackTimeB = b.profitPerHourDelta ? (b.price / b.profitPerHourDelta) : Infinity;
 				return paybackTimeA - paybackTimeB;
 			});
-	
+
 			let tableContent = `
 			<style>
-				body { 
-					font-family: Arial, sans-serif; 
-					background-color: #1e1e1e; 
+				body {
+					font-family: Arial, sans-serif;
+					background-color: #1e1e1e;
 					color: #e0e0e0;
 					margin: 0;
 					padding: 20px;
@@ -463,8 +542,8 @@
 					margin-bottom: 20px;
 					flex-wrap: wrap;
 				}
-				h1 { 
-					color: #61afef; 
+				h1 {
+					color: #61afef;
 					margin: 0;
 					margin-right: 20px;
 				}
@@ -492,20 +571,20 @@
 				#donateButton {
 					background-color: #e5c07b;
 				}
-				table { 
-					border-collapse: collapse; 
-					width: 100%; 
-					background-color: #2d2d2d; 
+				table {
+					border-collapse: collapse;
+					width: 100%;
+					background-color: #2d2d2d;
 					margin-top: 20px;
 				}
-				th, td { 
-					border: 1px solid #4a4a4a; 
-					padding: 12px; 
-					text-align: left; 
+				th, td {
+					border: 1px solid #4a4a4a;
+					padding: 12px;
+					text-align: left;
 				}
-				th { 
-					background-color: #383838; 
-					color: #61afef; 
+				th {
+					background-color: #383838;
+					color: #61afef;
 				}
 				tr:nth-child(even) { background-color: #333333; }
 				tr:hover { background-color: #3a3a3a; }
@@ -530,7 +609,7 @@
 					<th>Profit per Hour</th>
 					<th>Payback Time (hours)</th>
 				</tr>`;
-	
+
 			upgradesForBuy.forEach(item => {
 				const paybackTime = item.profitPerHourDelta ? (item.price / item.profitPerHourDelta) : Infinity;
 				const paybackClass = paybackTime <= 672 ? 'payback-good' : 'payback-bad';
@@ -547,9 +626,9 @@
 					<td class="${paybackClass}">${paybackTime !== Infinity ? paybackTime.toFixed(2) : 'N/A'}</td>
 				</tr>`;
 			});
-	
+
 			tableContent += '</table>';
-	
+
 			const newWindow = window.open('', '_blank');
 			newWindow.document.write(`
 			<html>
@@ -586,7 +665,7 @@
 				</body>
 			</html>`);
 			newWindow.document.close();
-	
+
 			console.log(`${logPrefix}Upgrades data displayed in new window`, styles.success);
 		} catch (error) {
 			console.log(`${logPrefix}Error displaying upgrades: ${error.message}`, styles.error);
@@ -615,12 +694,12 @@
 	  promoCodeButton.onclick = openPromoCodeWindow;
 	  document.body.appendChild(promoCodeButton);
 	}
-	
+
 	function checkPromoCodeInput() {
 	  const promoCodeInput = document.querySelector('.promocode-input-container');
 	  const promoCodeButton = document.querySelector('.promo-code-button');
 	  const morseButton = document.querySelector('.morse-button');
-	  
+
 	  if (promoCodeInput && promoCodeButton) {
 		promoCodeButton.style.display = 'block';
 		if (morseButton && morseButton.style.display !== 'none') {
@@ -632,7 +711,7 @@
 		promoCodeButton.style.display = 'none';
 	  }
 	}
-	
+
 	let promoCodeWindow = null;
 
 	function openPromoCodeWindow() {
@@ -654,14 +733,14 @@
 		<div id="promoCodeStats"></div>
 	  `;
 	  document.body.appendChild(promoCodeWindow);
-	  
+
 	  document.getElementById('startPromoCodeButton').onclick = startPromoCodeEntry;
 	  document.querySelector('.promo-code-window .close-button').onclick = () => {
 		document.body.removeChild(promoCodeWindow);
 		promoCodeWindow = null;
 	  };
 	}
-	
+
 	async function startPromoCodeEntry() {
 	  const promoCodes = document.getElementById('promoCodeInput').value.split('\n');
 	  const inputField = document.querySelector('.promocode-input-container input');
@@ -676,16 +755,23 @@
 		  continue;
 		}
 
+		const claimButton = document.querySelector('.bottom-sheet-button.button.button-primary.button-default span');
+		if (claimButton && claimButton.textContent === 'Claim') {
+		  claimButton.click();
+		  await new Promise(resolve => setTimeout(resolve, 2000));
+		  continue;
+		}
+
 		const cleanCode = code.trim().replace(/\s/g, '');
 		inputField.value = cleanCode;
 		inputField.dispatchEvent(new Event('input', { bubbles: true }));
-		
+
 		await new Promise(resolve => setTimeout(resolve, 1000));
-		
+
 		redeemButton.click();
-		
+
 		await new Promise(resolve => setTimeout(resolve, 2000));
-		
+
 		const result = await waitForPromoCodeResult();
 		if (result === 'success') {
 		  successCount++;
@@ -695,7 +781,7 @@
 		remainingCount--;
 
 		updatePromoCodeStats(successCount, errorCount, remainingCount);
-		
+
 		await new Promise(resolve => setTimeout(resolve, Math.random() * 8000 + 7000));
 	  }
 	}
@@ -705,7 +791,7 @@
 		const checkResult = () => {
 		  const successElement = document.querySelector('.promocode-text-success');
 		  const errorElement = document.querySelector('.promocode-text-error');
-		  
+
 		  if (successElement && successElement.style.display !== 'none') {
 			resolve('success');
 		  } else if (errorElement && errorElement.style.display !== 'none') {
@@ -721,12 +807,12 @@
 	function updatePromoCodeStats(success, error, remaining) {
 	  const statsElement = document.getElementById('promoCodeStats');
 	  statsElement.innerHTML = `
-		Success: <span class="success-count">${success}</span> | 
-		Error: <span class="error-count">${error}</span> | 
+		Success: <span class="success-count">${success}</span> |
+		Error: <span class="error-count">${error}</span> |
 		Remaining: <span class="remaining-count">${remaining}</span>
 	  `;
 	}
-	
+
 	const promoCodeStyles = `
 	  .promo-code-button {
 		position: fixed;
@@ -876,18 +962,18 @@
 
 		const autoBuyContainer = document.createElement('div');
 		autoBuyContainer.className = 'setting-item auto-buy-container';
-	
+
 		const autoBuyCheckbox = createSettingElement('Auto Buy', 'autoBuyEnabled', 'checkbox', null, null, null,
 			'EN: Automatically buy the most profitable upgrade.<br>' +
 			'RU: Автоматически покупать самое выгодное улучшение.');
-	
+
 		const maxPaybackHoursInput = createSettingElement('Max Payback Hours', 'maxPaybackHours', 'number', 1, 1000, 1,
 			'EN: Maximum payback time in hours for auto-buy.<br>' +
 			'RU: Максимальное время окупаемости в часах для автопокупки.');
-	
+
 		autoBuyContainer.appendChild(autoBuyCheckbox);
 		autoBuyContainer.appendChild(maxPaybackHoursInput);
-	
+
 		settingsMenu.appendChild(autoBuyContainer);
 
 		const pauseResumeButton = document.createElement('button');
@@ -1235,7 +1321,7 @@
 			container.appendChild(inputContainer);
 			return container;
 		}
-		
+
 		function updatePauseButtonState() {
 		  const pauseResumeButton = document.querySelector('.pause-resume-btn');
 		  if (pauseResumeButton) {
@@ -1261,12 +1347,13 @@
 			}
 			}
 
-		loadSettings();
-		updateSettingsMenu();
-		createPromoCodeButton();
-		setInterval(checkPromoCodeInput, 1000);
-		createResetButton();
-		setInterval(checkForEarnMoreCoins, 1000);
+		loadSettings(); // Load Settings
+		updateSettingsMenu(); // Update Settings Menu
+		createPromoCodeButton(); // Create Promo Code Button
+		setInterval(checkPromoCodeInput, 1000); // Check Promo Code Input every second
+		createResetButton(); // Create Reset Button
+		setInterval(checkForEarnMoreCoins, 1000); // Check for Earn More Coins every second
+		setInterval(adjustMinigameSizes, 1000); // Adjust minigame sizes every 1 second
 
 		function toggleScriptPause() {
 		  settings.isPaused = !settings.isPaused;
@@ -1279,8 +1366,11 @@
 
 	setTimeout(() => {
 		console.log(`${logPrefix}Script starting after 5 seconds delay...`, styles.starting);
-		clickThankYouBybitButton();
-		performRandomClick();
-		autoBuy();
-	}, 5000);
+		clickClaimDailyButton();
+		setTimeout(() => {
+			clickThankYouBybitButton();
+			performRandomClick();
+			autoBuy();
+		}, 2000);
+	}, 10000);
 })();
