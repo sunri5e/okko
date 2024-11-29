@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        duckmyduck autofeed
+// @name        duckmyduck autofeed 2
 // @namespace   Violentmonkey Scripts
 // @match       *://webapp.duckmyduck.com/*
 // @grant       none
@@ -64,8 +64,7 @@ function waitForElm(selector) {
   const activeSelector = 'div.top-0.absolute.ml-5.z-20';
   const balanceLimit = 50;
   const animDelay = 2000;
-  // const maxTaps = 79;
-  const maxTaps = 4;
+  const maxTaps = 79;
   const minTaps = 2;
 
   function startFeeding(callback) {
@@ -303,7 +302,7 @@ function waitForElm(selector) {
             const finishBanner = document.createElement('div');
 				    finishBanner.className = 'finish-banner';
 				    finishBanner.textContent = 'Window can be closed now';
-				
+
 				    const style = document.createElement('style');
 				    style.textContent = `
 				      .finish-banner {
@@ -324,6 +323,7 @@ function waitForElm(selector) {
 				      }
 				    `;
 				    document.head.appendChild(style);
+            document.body.appendChild(finishBanner);
 	        }
         });
       }
@@ -332,45 +332,3 @@ function waitForElm(selector) {
 
   observer.observe(document.body, { childList: true, subtree: true })
 })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
