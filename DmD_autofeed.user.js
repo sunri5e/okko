@@ -300,10 +300,31 @@ function waitForElm(selector) {
               collectHearts(resolve);
             });
 
-            // await new Promise((resolve) => {
-            //   watchAds(resolve);
-            // });
-          }
+            const finishBanner = document.createElement('div');
+				    finishBanner.className = 'finish-banner';
+				    finishBanner.textContent = 'Window can be closed now';
+				
+				    const style = document.createElement('style');
+				    style.textContent = `
+				      .finish-banner {
+				        position: fixed;
+				        bottom: 150px;
+				        left: 20px;
+				        background-color: rgba(36, 146, 255, 0.8);
+				        color: #fff;
+				        border: none;
+				        border-radius: 20px;
+				        width: auto;
+				        height: 40px;
+				        font-size: 18px;
+				        cursor: pointer;
+				        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+				        z-index: 9999;
+				        padding: 6px 20px;
+				      }
+				    `;
+				    document.head.appendChild(style);
+	        }
         });
       }
     });
