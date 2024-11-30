@@ -65,7 +65,7 @@ function waitForElm(selector) {
   const balanceLimit = 50;
   const animDelay = 2000;
   const maxTaps = 79;
-  const minTaps = 2;
+  const minTaps = 70;
 
   function startFeeding(callback) {
     const buttonElement = document.querySelector(activeSelector);
