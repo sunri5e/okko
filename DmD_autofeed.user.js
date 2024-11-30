@@ -164,7 +164,7 @@ function waitForElm(selector) {
   }
 
   async function collectHearts(callback) {
-    const breedingDucks = document.querySelectorAll("[src='/img/slides-bages/breeding-active.png']");
+    const breedingDucks = document.querySelectorAll("[src*='/img/slides-bages/breeding']");
     console.log('breedingDucks', breedingDucks);
 
     for (let item of breedingDucks) {
