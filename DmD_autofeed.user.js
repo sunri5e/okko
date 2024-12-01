@@ -185,9 +185,10 @@ function waitForElm(selector) {
   }
 
   async function clickClaimDailyButton(callback) {
+		await delay(getRandomInt(2000, 3000));
 		const aside = document.querySelector('aside.size-full');
 
-    if (aside && aside.innerText.toLocaleLowerCase().includes("everyday reward")) {
+    if (aside) {
       const claimButton = aside.querySelector('button.btn-primary');
 
       if (claimButton && claimButton.innerText.toLocaleLowerCase().includes("claim")) {
@@ -197,12 +198,17 @@ function waitForElm(selector) {
         await delay(getRandomInt(3500, 5000));
       } else {
         console.log("Claim button not found.");
+				callback();
+				return;
       }
     } else {
-        console.log("Aside with 'Everyday reward' not found.");
+      console.log("Asides with reward not found or already processed.");
+			callback();
+			return;
     }
 
-    callback();
+		var interval = getRandomInt(2000, 3000);
+    setTimeout(clickClaimDailyButton, interval);
 	}
 
   async function claimGift(callback) {
